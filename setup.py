@@ -12,8 +12,8 @@ from enum import IntEnum
 class Version(IntEnum):
 
     major = 0
-    minor = 1
-    patch = 9
+    minor = 2
+    patch = 0
 
 
 setup(
@@ -22,7 +22,7 @@ setup(
     version=f"{Version.major}.{Version.minor}.{Version.patch}",
     packages=["mpath"],
     install_requires=[
-        "tensorflow",
+        "torch",
         "numpy",
         "matplotlib",
         "PyQt5",

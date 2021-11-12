@@ -13,7 +13,7 @@ timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 # ------------------------------------------------------------------------------
 # TensorFlow
 # ------------------------------------------------------------------------------
-import tensorflow as tf
+import torch as pt
 
 # ------------------------------------------------------------------------------
 # Math
@@ -60,19 +60,19 @@ if __name__ == "__main__":
 
     # Network with activation and weight history
     net = Network(
-        layer_sizes=layer_sizes,
-        learn=True,
-        activation_history=True,
-        weight_history=True,
+        layer_sizes,
+        _learn=True,
+        _keep_activations=True,
+        _keep_weights=True,
     )
 
     # Signal generator
     # gen = Generator(input_size)
     gen = GratingGenerator(
         input_size,
-        tp=10,
-        ext=5,
-        gap=5,
+        _tp=10,
+        _ext=5,
+        _gap=5,
     )
 
     # Run the simulation
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     spot_size = 4
 
     # Disable learning
-    net.freeze()
+    # net.freeze()
 
     for step in range(1, steps + 1):
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         ###################################################
         # Constant flashes superimposed onto Gaussian noise
         ###################################################
-        signal = gen.noise()
+        signal = gen.gnoise()
         if step % 10 == 0:
             # signal = gen.constant(2 * random.random())
             signal = gen.constant(3.0)
@@ -223,12 +223,18 @@ if __name__ == "__main__":
 
     print()
 
-    path = f"./sim/{timestamp}"
+    path = f"../sim/{timestamp}"
 
     net.save(path)
 
-    plot_activations(path + "/params.npz", ["in", "ret", "act1", "act2"])
-    plot_weights(path + "/params.npz", [0, 1, 2])
+    plot_activations(
+        path + "/params.npz",
+        ["in", "ret", "act1", "act2"],
+        # _steps=[
+        #     (1500, 1600),
+        # ],
+    )
+    plot_weights(path + "/params.npz", [1, 2])
 
 # ===============================================
 

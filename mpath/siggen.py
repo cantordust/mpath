@@ -1,29 +1,27 @@
 # ------------------------------------------------------------------------------
-# TensorFlow
+# Global imports
 # ------------------------------------------------------------------------------
-import tensorflow as tf
+from typing import List
+from typing import Tuple
+from typing import Optional
 
-# ------------------------------------------------------------------------------
-# Numpy
-# ------------------------------------------------------------------------------
+import torch as pt
 import numpy as np
 
-# ------------------------------------------------------------------------------
-# Math functions
-# ------------------------------------------------------------------------------
 import math
 
-# ------------------------------------------------------------------------------
-# Random
-# ------------------------------------------------------------------------------
 import random
 
 
 class Generator:
+    """
+    Pattern generator.
+    """
+
     def __init__(
         self,
-        rows,
-        cols=1,
+        _rows: int,
+        _cols: int = 1,
     ):
 
         """
@@ -32,53 +30,91 @@ class Generator:
         Produces various signals with the right shape.
         """
 
-        self.rows = rows
-        self.cols = cols
+        self.rows = _rows
+        self.cols = _cols
 
-    def constant(self, value=1.0):
+    def _sparse(
+        self,
+        _indices: List[List[int]],
+        _values: List[float],
+        _shape: Optional[Tuple[int]] = None,
+    ) -> pt.Tensor:
+        return pt.sparse_coo_tensor(
+            _indices,
+            _values,
+            (self.rows, self.cols) if _shape is None else _shape,
+        )
+
+    def constant(
+        self,
+        _magnitude: float = 1.0,
+    ):
 
         """
         Constant input.
         """
 
-        return tf.constant(value, shape=(self.rows, self.cols))
+        return pt.full(
+            (self.rows,),
+            _magnitude,
+        )
 
-    def noise(self, mean=0.0, sd=1.0):
+    def gnoise(
+        self,
+        _mean: float = 0.0,
+        _sd: float = 1.0,
+    ):
 
         """
         Gaussian noise.
         """
 
-        return tf.random.normal(shape=(self.rows, self.cols), mean=mean, stddev=sd)
+        return pt.normal(
+            _mean,
+            _sd,
+            (self.rows,),
+        )
 
-    def unoise(self, min_val=-1.0, max_val=1.0):
+    def unoise(
+        self,
+        _min: float = -1.0,
+        _max: float = 1.0,
+    ):
 
         """
         Uniform noise.
         """
 
-        return tf.random.uniform(
-            shape=(self.rows, self.cols), minval=min_val, maxval=max_val
+        return pt.FloatTensor(self.rows, self.cols,).uniform_(
+            _min,
+            _max,
         )
 
-    def flash(self, value=1.0, pos=0, spot_size=4):
+    def flash(
+        self,
+        _magnitude: float = 1.0,
+        _pos: int = 0,
+        _size: int = 4,
+    ):
 
-        indices = [[i, 0] for i in range(pos, pos + spot_size)]
-        values = [value] * len(indices)
+        indices = [[i, 0] for i in range(_pos, _pos + _size)]
+        values = [_magnitude] * len(indices)
 
-        fl = tf.sparse.SparseTensor(indices, values, dense_shape=[self.rows, self.cols])
-
-        return tf.sparse.to_dense(fl)
+        return pt.reshape(self._sparse(indices, values).to_dense(), (self.rows,))
 
 
 class GratingGenerator(Generator):
+    """
+    A generator for grating patterns.
+    """
+
     def __init__(
         self,
-        rows,
-        cols=1,
-        tp=2,  # Temporal period
-        ext=1,  # Spatial extent
-        gap=1,  # Gap size
+        _rows: int,
+        _cols: int = 1,
+        _tp: int = 2,  # Temporal period
+        _ext: int = 1,  # Spatial extent
+        _gap: int = 1,  # Gap size
     ):
 
         """
@@ -86,32 +122,42 @@ class GratingGenerator(Generator):
         """
 
         assert (
-            gap + ext < rows
-        ), f"==[ Error: Invalid combination of gap and extent (gap + ext must be less than {rows})"
+            _gap + _ext < _rows
+        ), f"==[ Error: Invalid combination of gap and extent (gap + ext must be less than {_rows})"
 
-        super().__init__(rows, cols)
+        super().__init__(_rows, _cols)
 
-        self.grating = tf.zeros(shape=(rows, cols), dtype=np.float32)
+        self.grating = pt.zeros(_rows, _cols)
 
-        indices = []
+        indices = [[], []]
         values = []
         x = 0
-        while x < rows:
-            if x % (ext + gap) < ext:
-                indices.append([x, 0])
+
+        while x < _rows:
+            if x % (_ext + _gap) < _ext:
+                indices[0].append(x)
+                indices[1].append(0)
                 values.append(1.0)
             x += 1
 
-        on_off = tf.sparse.SparseTensor(indices, values, dense_shape=(rows, cols))
-        self.grating += tf.sparse.to_dense(on_off)
+        on_off = self._sparse(
+            indices,
+            values,
+            (_rows, _cols),
+        )
+        self.grating += on_off.to_dense()
 
-        self.tp = tp
+        self.tp = _tp
         self.step = 0
 
-    def roll(self, shift=1, axis=0):
+    def roll(
+        self,
+        _shift: int = 1,
+        _axis: int = 0,
+    ):
 
         if self.step >= self.tp:
-            self.grating = tf.roll(self.grating, shift, axis)
+            self.grating = pt.roll(self.grating, _shift, _axis)
             self.step = 0
 
         self.step += 1
