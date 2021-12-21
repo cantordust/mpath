@@ -11,10 +11,10 @@ import numpy as np
 # ------------------------------------------------------------------------------
 # Local imports
 # ------------------------------------------------------------------------------
-from mpath.layer.proto import ProtoLayer
+from mpath.layer.proto import TemporalAdaptationLayer
 
 
-class Dense(ProtoLayer):
+class Dense(TemporalAdaptationLayer):
 
     """
     A dense layer of neurons with incoming connections.

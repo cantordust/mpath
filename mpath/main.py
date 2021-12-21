@@ -287,8 +287,8 @@ if __name__ == "__main__":
 #             # Our operations on the frame come here
 #             grey = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-#             image = tf.transpose(tf.convert_to_tensor(grey,
-#                                                       dtype = tf.float32))
+#             image = pt.transpose(pt.convert_to_tensor(grey,
+#                                                       dtype = pt.float32))
 
 #             # if cv.waitKey(1) == ord('q'):
 #             #     break

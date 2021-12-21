@@ -9,7 +9,7 @@ import torch as pt
 import numpy as np
 
 
-class ProtoLayer:
+class TemporalAdaptationLayer:
     """
     A proto-layer containing only neurons (no synapses).
     All aspects of neuron dynamics (potentiation, activation, etc.)
@@ -21,6 +21,7 @@ class ProtoLayer:
         self,
         _size: int,
         _tau: Optional[np.ndarray] = None,
+        _threshold: bool = False,
         _activation_history: bool = False,
     ):
 
@@ -50,8 +51,8 @@ class ProtoLayer:
 
         # Threshold time constant.
         # The threshold adapts much faster than the membrane potential.
-        self.threshold_alpha = 10 * self.alpha
-        self.activation_alpha = self.threshold_alpha
+        self.threshold_alpha = 10 * self.alpha if _threshold else None
+        self.activation_alpha = self.threshold_alpha if _threshold else None
 
         # Exponential moving average and variance for the membrane potentials.
         self.potential_avg = pt.zeros_like(self.potentials)
