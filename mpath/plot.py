@@ -1,14 +1,17 @@
 # ------------------------------------------------------------------------------
-# Global imports
+# Imports
 # ------------------------------------------------------------------------------
 from typing import List
 from typing import Tuple
 
+# --------------------------------------#
 import numpy as np
 
+# --------------------------------------#
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable, axes_size
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from mpl_toolkits.axes_grid1 import axes_size
 from matplotlib.gridspec import GridSpec
 from matplotlib.ticker import FixedLocator
 from matplotlib.ticker import IndexLocator

@@ -13,7 +13,7 @@ class Version(IntEnum):
 
     major = 0
     minor = 2
-    patch = 0
+    patch = 1
 
 
 setup(
@@ -24,8 +24,9 @@ setup(
     install_requires=[
         "torch",
         "numpy",
+        "tensorboard",
         "matplotlib",
-        "PyQt5",
+        "python-opencv",
     ],
     license="MIT",
     long_description=open("README.md").read(),
