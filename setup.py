@@ -1,18 +1,16 @@
 # ------------------------------------------------------------------------------
-# Setup function
+# Imports
 # ------------------------------------------------------------------------------
 from distutils.core import setup
 
-# ------------------------------------------------------------------------------
-# Enum (used for versioning)
-# ------------------------------------------------------------------------------
+# --------------------------------------
 from enum import IntEnum
 
 
 class Version(IntEnum):
 
     major = 0
-    minor = 2
+    minor = 3
     patch = 1
 
 
@@ -24,8 +22,8 @@ setup(
     install_requires=[
         "torch",
         "numpy",
-        "tensorboard",
-        "matplotlib",
+        "dotmap",
+        "plotly",
         "python-opencv",
     ],
     license="MIT",

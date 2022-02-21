@@ -5,18 +5,18 @@ from typing import Any
 from typing import List
 from typing import Optional
 
-# --------------------------------------#
+# --------------------------------------
 from pathlib import Path
 
-# --------------------------------------#
+# --------------------------------------
 import numpy as np
 
-# --------------------------------------#
+# --------------------------------------
 import torch as pt
 
-# --------------------------------------#
+# --------------------------------------
 from mpath.aux.types import Param
-from mpath.layer import ProtoLayer
+from mpath.layer import Layer
 
 # ------------------------------------------------------------------------------
 # Configuration
@@ -35,7 +35,7 @@ class Network:
 
     def __init__(
         self,
-        _layers: List[ProtoLayer],
+        _layers: List[Layer],
         _name: str = "Network",
     ):
 
@@ -49,7 +49,7 @@ class Network:
 
         # Summary writer operations.
 
-    # ==[ Protected methods ]==#
+    # ==[ Protected methods ]==
 
     def _get_params(self):
 
@@ -61,10 +61,10 @@ class Network:
 
     def _get_history(self):
 
-        history = {}
+        history = []
 
         for idx, layer in enumerate(self.layers, 1):
-            history[layer.name] = layer.history
+            history.append(layer.history)
 
         return history
 
@@ -78,12 +78,6 @@ class Network:
         """
         Integrate input signals and propagate activations through the network.
         """
-
-        # Capture inputs with the sensors
-        self.sensors.forward(_input)
-
-        _input = self.sensors.activations
-
         # Propagate the inputs through the layers
         for layer in self.layers:
             layer.forward(_input)
